@@ -3,9 +3,10 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { ValidationService } from 'src/common/validation.service';
-import { CreateProductRequest, ProductResponse, UpdateProductRequest } from 'src/model/product.model';
+import { CreateProductRequest, ProductResponse, SearchProductRequest, UpdateProductRequest } from 'src/model/product.model';
 import { ProductValidation } from './product.validation';
 import {Paging} from 'src/model/web.model';
+import { ProductSortBy } from 'src/model/product.model';
 
 @Injectable()
 export class ProductService {
@@ -214,8 +215,8 @@ export class ProductService {
         stock: product.stock,
         image: product.image ?? undefined,
         slug: product.slug,
-        isActive: product.isActive,
         categoryId: product.categoryId,
+        isActive: product.isActive,
         category: {
             id: product.category.id,
             name: product.category.name,
@@ -224,5 +225,87 @@ export class ProductService {
         },
         createdAt: product.createdAt,
     };
+  }
+  async searchAndFilter(request: SearchProductRequest): Promise<{data: ProductResponse[]; paging: Paging}>{
+    this.logger.debug(`Searching products with filters: ${JSON.stringify(request)}`);
+    //Validation
+    const validatedRequest= this.validationService.validate(ProductValidation.SEARCH_AND_FILTER, request);
+    this.logger.debug(`sortBy: ${validatedRequest.sortBy}`);
+    // Set Default values
+    const page = validatedRequest.page || 1;
+    const size = validatedRequest.size || 10;
+    const skip = ( page - 1) * size;
+    
+      // Build where clause berdasarkan filter yang dikirim
+    const where: any={
+      isActive:true, // hanya produk aktif
+    }
+    // Search by nama atau deskripsi
+    if (validatedRequest.search){
+      where.OR = [
+        { name: { contains: validatedRequest.search}},
+        { description: { contains: validatedRequest.search}}
+      ]
+    }
+    // Filter by kategori
+    if(validatedRequest.categoryId){
+      where.categoryId = validatedRequest.categoryId;
+    }
+      // Filter by range harga — pakai object price supaya bisa kombinasi min & max
+    if(validatedRequest.minPrice !== undefined || validatedRequest.maxPrice !== undefined){
+      where.price = {};
+      if (validatedRequest.minPrice !== undefined) where.price.gte = validatedRequest.minPrice //gte = Greater Than or Equal
+      if (validatedRequest.maxPrice !== undefined) where.price.lte = validatedRequest.maxPrice //lte = lte Than or Equal
+    }
+
+    // Sorting — default terbaru
+    const orderBy: any = 
+    validatedRequest.sortBy === ProductSortBy.PRICE_ASC ? { price: 'asc'}:
+    validatedRequest.sortBy === ProductSortBy.PRICE_DESC ? { price: 'desc'}:
+    {createdAt: 'desc'}
+
+    const [products, total] = await Promise.all([
+      this.PrismaService.product.findMany({
+        where,
+        orderBy,
+        skip,
+        take: size,
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          price: true,
+          slug: true,
+          stock: true,
+          categoryId: true,
+          createdAt: true,
+          updatedAt: true,
+          isActive: true,
+        }
+      }),
+      this.PrismaService.product.count({where})
+    ]);
+
+    const data: ProductResponse[] = products.map((product)=>({
+      id: product.id,
+      name: product.name,
+      description: product.description ?? undefined,
+      price: product.price.toNumber(),
+      stock: product.stock,
+      slug: product.slug,
+      isActive: product.isActive,
+      categoryId: product.categoryId,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+    }))
+
+    return {
+      data,
+      paging: {
+        page,
+        size,
+        totalPage: Math.ceil(total/size)
+      }
+    }
   }
 }

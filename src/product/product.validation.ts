@@ -20,4 +20,13 @@ export class ProductValidation {
         isActive: z.boolean().optional(),
         categoryId: z.string().min(1).optional(),
     });
+    static readonly SEARCH_AND_FILTER = z.object({
+        search: z.string().optional(),
+        categoryId: z.string().optional(),
+        minPrice: z.number().min(0).optional(),
+        maxPrice: z.number().min(0).optional(),
+        sortBy: z.enum(['NEWEST', 'PRICE_ASC', 'PRICE_DESC']).optional(),
+        page: z.number().min(1).optional(),
+        size: z.number().min(1).max(100).optional()
+    })
 }

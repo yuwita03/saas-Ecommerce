@@ -4,16 +4,16 @@ import { AddToCartRequest, CartResponse, UpdateCartItemRequest } from 'src/model
 import { Auth } from '../common/Auth/auth.decorator';
 import type { User } from '@prisma/client';
 import { WebResponse } from 'src/model/web.model';
-import { Roles } from 'src/common/Guards/roles.decorator';
-import { RolesGuard } from 'src/common/Guards/roles.guard';
-import { OrderResponse } from 'src/model/order.model';
-import { size } from 'zod';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('Cart')
+@ApiBearerAuth()
 @Controller('/api/cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   // User login - tambah produk ke cart
+  @ApiOperation({ summary: 'Add produk ke cart' })
   @Post()
   @HttpCode(200)
   async addToCart(
@@ -24,6 +24,8 @@ export class CartController {
     return {data: result};
   }
 
+
+  @ApiOperation({ summary: 'Get isi cart' })
   @Get()
   @HttpCode(200)
   async getCart(
@@ -33,6 +35,7 @@ export class CartController {
     return {data: result};
   }
 
+  @ApiOperation({ summary: 'Update quantity item' })
   @Patch('/:itemId')
   @HttpCode(200)
   async updateItem(
@@ -44,6 +47,7 @@ export class CartController {
     return this.getCart(user);
   }
 
+  @ApiOperation({ summary: 'Hapus item dari cart' })
   @Delete('/:itemId')
   @HttpCode(200)
   async removeItem(
@@ -54,6 +58,7 @@ export class CartController {
     return {data: result};
   }
 
+  @ApiOperation({ summary: 'Kosongkan cart' })
   @Delete()
   @HttpCode(200)
   async clearItem(

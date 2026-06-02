@@ -1,5 +1,11 @@
 import { CategoryResponse } from "./category.model";
 
+export enum ProductSortBy {
+  NEWEST = 'NEWEST',       // terbaru
+  PRICE_ASC = 'PRICE_ASC', // harga terendah
+  PRICE_DESC = 'PRICE_DESC', // harga tertinggi
+}
+
 export class CreateProductRequest {
   name!: string;
   description?: string;  // opsional
@@ -21,6 +27,17 @@ export class UpdateProductRequest {
   isActive?: boolean;
   categoryId?: string; 
 }
+
+export class SearchProductRequest{
+  search?: string;
+  categoryId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: ProductSortBy; // ✅ GUNAKAN ENUM
+  page?: number;
+  size?: number;
+}
+
 
 export class ProductResponse {
   id!: string;

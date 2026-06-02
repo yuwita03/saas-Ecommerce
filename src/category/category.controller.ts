@@ -5,7 +5,9 @@ import { Role } from 'src/common/roles.enum';
 import { Roles } from 'src/common/Guards/roles.decorator';
 import { RolesGuard } from 'src/common/Guards/roles.guard';
 import { WebResponse } from '../model/web.model';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Category')
 @Controller('/api/categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -20,6 +22,8 @@ export class CategoryController {
     return result;
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update Category (Admin)' })
   @Patch('/:id')
   @HttpCode(200)
   @UseGuards(RolesGuard)
@@ -30,7 +34,9 @@ export class CategoryController {
       const result = await this.categoryService.update(request, id);
       return { data: result };
   }
-
+  
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update Category (Admin)' })
   @Delete('/:id')
   @HttpCode(200)
   @UseGuards(RolesGuard)
@@ -40,6 +46,7 @@ export class CategoryController {
     return { data: result };
   }
 
+  @ApiOperation({ summary: 'Get semua kategori' })
   @Get()
   @HttpCode(200)
   async getAll(): Promise<WebResponse<CategoryResponse[]>> {
@@ -47,6 +54,7 @@ export class CategoryController {
     return { data: result };
   }
 
+  @ApiOperation({ summary: 'Get category by id' })
   @Get('/:id')
   @HttpCode(200)
   async getById(@Param('id') id: string): Promise<WebResponse<CategoryResponse>> {

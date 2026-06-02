@@ -3,11 +3,15 @@ import { PaymentService } from './payment.service';
 import { WebResponse } from 'src/model/web.model';
 import { Auth } from 'src/common/Auth/auth.decorator';
 import type { User } from '@prisma/client';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('Payment')
 @Controller('/api/payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Buat pembayaran Midtrans' })
   @Post('/:orderId')
   @HttpCode(200)
   async createPayment (
@@ -18,6 +22,7 @@ export class PaymentController {
     return{data:result}
   }
 
+  @ApiOperation({ summary: 'Webhook Midtrans' })
   @Post('/webhook')
   @HttpCode(200)
   async handleWebHook(@Body() notification: any): Promise<WebResponse<boolean>>{

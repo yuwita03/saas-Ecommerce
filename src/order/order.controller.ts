@@ -7,11 +7,15 @@ import type { User } from '@prisma/client';
 import { Roles } from 'src/common/Guards/roles.decorator';
 import { Role } from 'src/common/roles.enum';
 import { RolesGuard } from 'src/common/Guards/roles.guard';
+import { ApiTags,ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('Order')
+@ApiBearerAuth()
 @Controller('/api/orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @ApiOperation({ summary: 'Checkout' })
   @Post()
   @HttpCode(200)
   async checkout(
@@ -22,6 +26,7 @@ export class OrderController {
     return { data: result };
   }
 
+  @ApiOperation({ summary: 'Get semua order user' })
   @Get()
   @HttpCode(200)
   async getAll(
@@ -31,6 +36,7 @@ export class OrderController {
     return {data: result}
   }
 
+  @ApiOperation({ summary: 'Get semua order (Admin)' })
   @Get('/admin')
   @HttpCode(200)
   @UseGuards(RolesGuard)
@@ -46,7 +52,7 @@ export class OrderController {
     }
   }
 
-  
+  @ApiOperation({ summary: 'Update status order (Admin)' })
   @Patch('/admin/:orderId/status')
   @HttpCode(200)
   @UseGuards(RolesGuard)
@@ -58,8 +64,8 @@ export class OrderController {
     const result = await this.orderService.updateStatus(orderId, body.status)
     return { data: result }
   }
-
-
+  
+  @ApiOperation({ summary: 'Get order by id' })
   @Get('/:id')
   @HttpCode(200)
   async getById(
@@ -70,6 +76,7 @@ export class OrderController {
     return {data: result}
   }
 
+  @ApiOperation({ summary: 'Cancel order' })
   @Delete('/:orderId/cancel')
   @HttpCode(200)
   async delete(

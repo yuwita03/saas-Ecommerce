@@ -9,16 +9,21 @@ import { Auth } from '../common/Auth/auth.decorator';
 import { RolesGuard } from 'src/common/Guards/roles.guard';
 import { Role } from 'src/common/roles.enum';
 import { Roles } from 'src/common/Guards/roles.decorator';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+@ApiTags("User")  // grup endpoint di swagger
 @Controller('/api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiOperation({ summary: 'Rgegister user baru'})
   @Post()
   @HttpCode(200)
   async register(@Body() request: RegisterUserRequest) {
     return this.userService.register(request);
   }
 
+  @ApiOperation({ summary: 'Login User'})
   @Post('/login')
   @HttpCode(200)
   async login(@Body() request: LoginUserRequest): Promise<WebResponse<UserResponse>> {
@@ -28,6 +33,8 @@ export class UserController {
     };
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Logout User'})
   @Delete('/logout')
   @HttpCode(200)
   async Logout(@Auth() user: User): Promise<WebResponse<boolean>> {
@@ -37,6 +44,8 @@ export class UserController {
     };
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update profile User'})
   @Patch()
   @HttpCode(200)
   async update(@Body() request: UpdateUserRequest, @Auth() user: User): Promise<WebResponse<UserResponse>> {
@@ -46,6 +55,8 @@ export class UserController {
     };
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'get User'})
   @Get()
   @HttpCode(200)
   async get(@Auth() user: User): Promise<WebResponse<UserResponse>> {
@@ -82,4 +93,5 @@ export class UserController {
         data: result,
     }
   }
+
 }

@@ -1,14 +1,35 @@
-import { Controller, HttpCode, Post, Body, Patch, Param, Delete, Get } from '@nestjs/common';
+import {
+  Controller,
+  HttpCode,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Get,
+} from '@nestjs/common';
 import { AddressService } from './address.service';
-import { AddressResponse, CreateAddressRequest, UpdateAddressRequest} from 'src/model/address.model';
+import {
+  AddressResponse,
+  CreateAddressRequest,
+  UpdateAddressRequest,
+} from 'src/model/address.model';
 import { WebResponse } from 'src/model/web.model';
 import { Auth } from '../common/Auth/auth.decorator';
 import type { User } from '@prisma/client';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
+@ApiTags('Address')
+@ApiBearerAuth()
 @Controller('/api/addresses')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
+  @ApiOperation({ summary: 'Create Address' })
   @Post()
   @HttpCode(200)
   async create(
@@ -19,6 +40,7 @@ export class AddressController {
     return { data: result };
   }
 
+  @ApiOperation({ summary: 'Update Address' })
   @Patch('/:id')
   @HttpCode(200)
   async update(
@@ -30,31 +52,34 @@ export class AddressController {
     return { data: result };
   }
 
+  @ApiOperation({ summary: 'Delete Address' })
   @Delete('/:id')
   @HttpCode(200)
   async delete(
     @Auth() user: User,
     @Param('id') id: string,
-  ): Promise<WebResponse<boolean>>{
+  ): Promise<WebResponse<boolean>> {
     const result = await this.addressService.delete(user, id);
     return { data: result };
   }
 
+  @ApiOperation({ summary: 'Get All User Addresses' })
   @Get()
   @HttpCode(200)
   async getAll(
     @Auth() user: User,
-  ): Promise<WebResponse<AddressResponse[]>>{
+  ): Promise<WebResponse<AddressResponse[]>> {
     const result = await this.addressService.getAll(user);
     return { data: result };
   }
 
+  @ApiOperation({ summary: 'Get Address By Id' })
   @Get('/:id')
   @HttpCode(200)
   async getById(
     @Auth() user: User,
     @Param('id') id: string,
-  ): Promise<WebResponse<AddressResponse>>{
+  ): Promise<WebResponse<AddressResponse>> {
     const result = await this.addressService.getById(user, id);
     return { data: result };
   }
@@ -63,10 +88,12 @@ export class AddressController {
   @HttpCode(200)
   async setDefault(
     @Auth() user: User,
-    @Param('id') id:string,
-  ): Promise<WebResponse<AddressResponse>>{
-    const result = await this.addressService.update(user,id, {isDefault: true});
+    @Param('id') id: string,
+  ): Promise<WebResponse<AddressResponse>> {
+    const result = await this.addressService.update(user, id, {
+      isDefault: true,
+    });
+
     return { data: result };
   }
-  
 }

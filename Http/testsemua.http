@@ -1,0 +1,15 @@
+###Search Product
+GET http://localhost:3000/api/products/search?search=nike
+
+###
+
+GET http://localhost:3000/api/products/search?categoryId=2a200969-a942-457e-8699-8614e7c6e7d1
+###
+
+GET http://localhost:3000/api/products/search?minPrice=10000&maxPrice=750000
+####
+
+GET http://localhost:3000/api/products/search?sortBy=PRICE_DESC
+####
+
+GET http://localhost:3000/api/products/search?search=baik&sortBy=PRICE_ASC&page=1&size=2
