@@ -8,11 +8,9 @@ async function bootstrap() {
 
 
   // Izinkan request dari FE localhost
-  app.enableCors({
-    origin: ['http://localhost:5173',],
-    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'authorization'],
-  });
+app.enableCors({
+  origin: '*',
+});
 
 
   //Setup Swagger
