@@ -8,9 +8,7 @@ async function bootstrap() {
 
   // Izinkan request dari FE localhost
 app.enableCors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: 'http://localhost:5173',
   credentials: true,
 });
 console.log('🔥 CORS BOOTSTRAPPED');
