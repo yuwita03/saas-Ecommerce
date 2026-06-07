@@ -93,4 +93,12 @@ export class ProductController {
     const result = await this.productService.getById(id);
     return { data: result }
   }
+
+  @ApiOperation({ summary: 'Get Product by slug'})
+  @Get("/:slug")
+  @HttpCode(200)
+  async getBySlug(@Param('id') slug: string): Promise<WebResponse<ProductResponse>>{
+    const result = await this.productService.getBySlug(slug);
+    return {data: result}
+  }
 }

@@ -7,6 +7,7 @@ import { CreateProductRequest, ProductResponse, SearchProductRequest, UpdateProd
 import { ProductValidation } from './product.validation';
 import {Paging} from 'src/model/web.model';
 import { ProductSortBy } from 'src/model/product.model';
+import { Product } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
@@ -307,5 +308,34 @@ export class ProductService {
         totalPage: Math.ceil(total/size)
       }
     }
+  }
+  async getBySlug(slug: string): Promise<ProductResponse>{
+    const product = await this.PrismaService.product.findUnique({
+      where: {slug},
+      include:{category:true}
+    })
+
+    if(!product){
+      throw new HttpException('Slug not found', 404)
+    }
+
+    return {
+        id: product.id,
+        name: product.name,
+        description: product.description ?? undefined,
+        price: Number(product.price),
+        stock: product.stock,
+        image: product.image ?? undefined,
+        slug: product.slug,
+        categoryId: product.categoryId,
+        isActive: product.isActive,
+        category: {
+            id: product.category.id,
+            name: product.category.name,
+            slug: product.category.slug,
+            createdAt: product.category.createdAt,
+        },
+        createdAt: product.createdAt,
+    };
   }
 }
