@@ -1,0 +1,7 @@
+POST https://recollect-catalyst-slogan.ngrok-free.dev/api/payment/webhook
+Content-Type: application/json
+
+{
+  "order_id": "a5780745-ecaf-462a-95e4-bacc98d99026",
+  "transaction_status": "settlement"
+}

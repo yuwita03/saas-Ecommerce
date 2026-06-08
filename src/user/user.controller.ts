@@ -1,6 +1,4 @@
 import { Controller, Get, Post, Body, Patch, Delete, HttpCode, UseGuards, Query, Inject, Param } from '@nestjs/common';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import type { User } from '@prisma/client';
 import { UserService } from './user.service';
 import { LoginUserRequest, RegisterUserRequest, UpdateUserRequest, UserResponse } from 'src/model/user.model';
@@ -12,7 +10,7 @@ import { Roles } from 'src/common/Guards/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags("User")  // grup endpoint di swagger
-@Controller('/api/users')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -37,7 +35,7 @@ export class UserController {
   @ApiOperation({ summary: 'Logout User'})
   @Delete('/logout')
   @HttpCode(200)
-  async Logout(@Auth() user: User): Promise<WebResponse<boolean>> {
+  async logout(@Auth() user: User): Promise<WebResponse<boolean>> {
     await this.userService.logout(user);
     return {
       data: true,
@@ -58,7 +56,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'get User'})
   @Get()
-  @HttpCode(200)
+  // unnecessaryto add httpCode
   async get(@Auth() user: User): Promise<WebResponse<UserResponse>> {
     const result = await this.userService.get(user);
     return {
@@ -93,5 +91,15 @@ export class UserController {
         data: result,
     }
   }
+
+  @Delete('/:id')
+  @HttpCode(200)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  async deleteByAdmin(@Param('id') id:string): Promise<WebResponse<boolean>>{
+    const result = await this.userService.deleteByAdmin(id);
+    return {data:result}
+  }
+  
 
 }

@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { AuthService } from 'src/common/Auth/auth.service';
 import { Paging } from '../model/web.model';
+import { Role } from '../common/roles.enum'
 @Injectable()
 export class UserService {
   constructor (
@@ -40,9 +41,11 @@ export class UserService {
 
 
         return {
+          id: user.id,
           username: user.username,
           email: user.email,
           name: user.name,
+          avatar: user.avatar,
           role: user.role,
         };
     }
@@ -73,10 +76,12 @@ export class UserService {
       });
 
       return {
+        id: user.id,
         username: user.username,
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
         token: user.token
       };
     }
@@ -91,10 +96,12 @@ export class UserService {
         }
       });
       return {
+        id: result.id,
         username: result.username,
         name: result.name,
         email: result.email,
         role: result.role,
+        avatar: result.avatar,
         token: result.token
       };
     }
@@ -110,6 +117,7 @@ export class UserService {
       if (updateRequest.username) data.username = updateRequest.username;
       if (updateRequest.name) data.name = updateRequest.name;
       if (updateRequest.email) data.email = updateRequest.email;
+      if (updateRequest.avatar) data.avatar = updateRequest.avatar;
       if (updateRequest.password) data.password = await bcrypt.hash(updateRequest.password, 10);
 
       // hanya field yang ada di object data 
@@ -118,20 +126,24 @@ export class UserService {
         data: data
       });
       return {
+        id: result.id,
         username: result.username,
         name: result.name,
         email: result.email,
         role: result.role,
-        token: result.token ?? undefined
+        avatar: result.avatar,
+        // token: result.token ?? undefined
       };
     }
     async get(user: User): Promise<UserResponse> {
       this.logger.debug(`Getting user profile for: ${user.username}`);
       return {
+        id: user.id,
         username: user.username,
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
       }
     }
     async getUser(page: number = 1, size: number = 10) : Promise<{data: UserResponse[]; paging: Paging}> {
@@ -148,6 +160,7 @@ export class UserService {
             username: true,
             name: true,
             email: true,
+            avatar: true,
             role: true,
             createdAt: true,
           }
@@ -163,7 +176,6 @@ export class UserService {
         }
       }
     }
-    //ADMIN
     async updateByAdmin(request: UpdateUserRequest, id: string): Promise<UserResponse> {
       this.logger.debug(`Admin updating user with id: ${id} and data: ${JSON.stringify(request)}`);
       const data: Partial<User> = {};
@@ -172,17 +184,37 @@ export class UserService {
       if (request.email) data.email = request.email;
       if (request.password) data.password = await bcrypt.hash(request.password, 10);
       if (request.role) data.role = request.role;
+      if (request.avatar) data.avatar = request.avatar;
+      
 
       const result = await this.prismaService.user.update({
         where: {id},
         data
       });
       return {
+        id: result.id,
         username: result.username,
         name: result.name,
         email: result.email,
         role: result.role,
+        avatar: result.avatar,
         token: result.token ?? undefined
       };
+    }
+    async deleteByAdmin (id:string):Promise<boolean>{
+      this.logger.debug(`Delete user ${id}`)
+      const existing = await this.prismaService.user.findUnique({ where: { id } })
+      if (!existing) throw new HttpException('User not found', 404)
+      if(existing.role === Role.ADMIN)throw new HttpException('User not found', 404)
+
+      // Hapus semua relasi dulu sebelum delete user
+      await this.prismaService.cartItem.deleteMany({ where: { cart: { userId: id } } })
+      await this.prismaService.cart.deleteMany({ where: { userId: id } })
+      await this.prismaService.orderItem.deleteMany({ where: { order: { userId: id } } })
+      await this.prismaService.order.deleteMany({ where: { userId: id } })
+      await this.prismaService.address.deleteMany({ where: { userId: id } })
+
+      await this.prismaService.user.delete({ where: { id } })
+      return true;
     }
 }

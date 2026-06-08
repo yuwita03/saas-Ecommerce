@@ -18,12 +18,15 @@ export class UpdateUserRequest {
     email?: string
     password?: string;
     role?: string;
+    avatar?: string;
 }
 
 export class UserResponse {
+    id!: string;
     username!: string;
     name!: string;
     email!: string;
     role!: string;
+    avatar?: string | null;
     token?: string | null;
 }

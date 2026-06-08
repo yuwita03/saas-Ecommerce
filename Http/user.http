@@ -1,11 +1,11 @@
 # User Registration
-POST https://your-app.up.railway.app/api/users
+POST http://localhost:3000/api/register
 Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "Nekoyuu",
-  "username": "nekoyuu",
+  "name": "admin2",
+  "username": "admin2",
   "email": "nekoyuu@example.com",
   "password": "password123"
 
@@ -18,7 +18,7 @@ Accept: application/json
 
 {
   "username": "admin",
-  "password": "admin123"
+  "password": "admin123",
 }
 
 ###Logout
@@ -33,8 +33,9 @@ Accept: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1M2QwZjQ1ZS1mNzEzLTRiNTYtODI2ZS1iNDU1MDExYmFmZDgiLCJpYXQiOjE3ODAzMTQwMDAsImV4cCI6MTc4MDkxODgwMH0.DxZCpNiX9Gkt1SMH3UsYExeYOIjDfMjFmxaZ7I8Fawk
 
 {
-  "name": "admin",
-  "email": "admin@example.com"
+  "username": "admin",
+  "password": "admin123",
+  "role": "admin"
 }
 
 # ===== ADMIN =====

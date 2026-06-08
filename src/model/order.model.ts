@@ -1,3 +1,5 @@
+import { UserResponse } from "./user.model"
+
 export class CheckoutRequest {
     addressId!: string
 }
@@ -15,6 +17,7 @@ export class OrderResponse{
     status!: string
     totalPrice!: number
     addressId!: string
+    user?: UserResponse
     items!: OrderItemResponse[]
     createdAt!: Date
 }

@@ -9,7 +9,7 @@ import { ProductSortBy } from 'src/model/product.model';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Products')
-@Controller('/api/products')
+@Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -86,6 +86,14 @@ export class ProductController {
     }
   } 
 
+  @ApiOperation({ summary: 'Get Product by slug'})
+  @Get("/:slug")
+  @HttpCode(200)
+  async getBySlug(@Param('slug') slug: string): Promise<WebResponse<ProductResponse>>{
+    const result = await this.productService.getBySlug(slug);
+    return {data: result}
+  }
+
   @ApiOperation({ summary: 'Get Product by id' })
   @Get('/:id')
   @HttpCode(200)
@@ -94,11 +102,5 @@ export class ProductController {
     return { data: result }
   }
 
-  @ApiOperation({ summary: 'Get Product by slug'})
-  @Get("/:slug")
-  @HttpCode(200)
-  async getBySlug(@Param('id') slug: string): Promise<WebResponse<ProductResponse>>{
-    const result = await this.productService.getBySlug(slug);
-    return {data: result}
-  }
+
 }

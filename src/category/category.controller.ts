@@ -8,7 +8,7 @@ import { WebResponse } from '../model/web.model';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Category')
-@Controller('/api/categories')
+@Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 

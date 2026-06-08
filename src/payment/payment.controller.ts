@@ -5,8 +5,8 @@ import { Auth } from 'src/common/Auth/auth.decorator';
 import type { User } from '@prisma/client';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
-@ApiTags('Payment')
-@Controller('/api/payment')
+@ApiTags('payment')
+@Controller('payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 

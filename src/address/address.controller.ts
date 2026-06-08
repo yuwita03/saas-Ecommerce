@@ -25,7 +25,7 @@ import {
 
 @ApiTags('Address')
 @ApiBearerAuth()
-@Controller('/api/addresses')
+@Controller('addresses')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 

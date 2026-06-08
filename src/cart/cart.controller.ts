@@ -8,7 +8,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('Cart')
 @ApiBearerAuth()
-@Controller('/api/cart')
+@Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 

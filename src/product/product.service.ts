@@ -8,6 +8,7 @@ import { ProductValidation } from './product.validation';
 import {Paging} from 'src/model/web.model';
 import { ProductSortBy } from 'src/model/product.model';
 import { Product } from '@prisma/client';
+import { json } from 'zod';
 
 @Injectable()
 export class ProductService {
@@ -18,7 +19,7 @@ export class ProductService {
   ) {}
 
   async create(request: CreateProductRequest): Promise<ProductResponse> {
-    this.logger.debug(`Creating product: ${JSON.stringify(request)}`);
+    this.logger.debug(`Creating product: ${JSON.stringify(json)}`);
 
     // Validasi input dari client
     const createRequest = this.validationService.validate(
@@ -96,7 +97,7 @@ export class ProductService {
         const slugExist = await this.PrismaService.product.findUnique({
             where: { slug: updateRequest.slug },
         });
-        if(slugExist){
+        if(slugExist && slugExist.id !== id){
             throw new HttpException('Product with the same slug already exists', 400);
         }
     }
@@ -271,18 +272,7 @@ export class ProductService {
         orderBy,
         skip,
         take: size,
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          price: true,
-          slug: true,
-          stock: true,
-          categoryId: true,
-          createdAt: true,
-          updatedAt: true,
-          isActive: true,
-        }
+        include: {category: true} // data category akan di dapatkan
       }),
       this.PrismaService.product.count({where})
     ]);
@@ -293,9 +283,16 @@ export class ProductService {
       description: product.description ?? undefined,
       price: product.price.toNumber(),
       stock: product.stock,
+      image: product.image ?? undefined,
       slug: product.slug,
       isActive: product.isActive,
       categoryId: product.categoryId,
+        category: {                    
+            id: product.category.id,
+            name: product.category.name,
+            slug: product.category.slug,
+            createdAt: product.category.createdAt,
+          },
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     }))
